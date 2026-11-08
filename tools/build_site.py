@@ -7,7 +7,7 @@ The table makes the page useful from Google searches like "kindergeld auszahlung
 import datetime, html, json, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-APP_STORE_URL = "https://apps.apple.com/de/app/idXXXXXXXXXX"  # TODO: real App Store link after release
+APP_STORE_URL = "https://apps.apple.com/de/app/id6832220805"  # App Store Connect app 6832220805 (live after release)
 MONTHS = "Januar Februar März April Mai Juni Juli August September Oktober November Dezember".split()
 WEEKDAYS = "Mo Di Mi Do Fr Sa So".split()
 
@@ -23,7 +23,7 @@ def table(dates: dict[str, list[str]], year: int) -> str:
     rows = []
     for m in sorted(by_month):
         cells = "".join(
-            f"<td>{WEEKDAYS[x.weekday()]} {x.day}.</td>" if (x := by_month[m].get(str(d))) else "<td>–</td>"
+            f"<td>{WEEKDAYS[x.weekday()]} {x.day}.</td>" if (x := by_month[m].get(str(d))) else "<td>-</td>"
             for d in range(10))
         rows.append(f"<tr><th scope=row>{MONTHS[m - 1]}</th>{cells}</tr>")
     return (f"<h2 id=termine-{year}>Kindergeld-Auszahlungstermine {year}</h2>\n"
@@ -36,7 +36,7 @@ def main() -> None:
     this_year = datetime.date.today().year
     years = sorted({int(s[:4]) for days in t["dates"].values() for s in days if int(s[:4]) >= this_year})
     tables = "\n".join(table(t["dates"], y) for y in years)
-    span = f"{years[0]}" if len(years) == 1 else " und ".join(map(str, years)) if len(years) == 2 else f"{years[0]}–{years[-1]}"
+    span = f"{years[0]}" if len(years) == 1 else " und ".join(map(str, years)) if len(years) == 2 else f"{years[0]} bis {years[-1]}"
     amount = t["amountPerChildCents"].get(str(datetime.date.today().year))
     amount_line = (f"<p>Kindergeld {datetime.date.today().year}: <strong>{amount // 100} € pro Kind und Monat</strong>. "
                    "Kinderzuschlag wird am selben Tag überwiesen.</p>") if amount else ""
@@ -45,8 +45,8 @@ def main() -> None:
 <html lang="de">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kindergeld Auszahlungstermine {span} nach Endziffer – Kindergeld App</title>
-<meta name="description" content="Alle Kindergeld-Auszahlungstermine {span} für Endziffer 0–9 als Tabelle. Mit App: Erinnerung am Vortag, Countdown-Widget (Pro).">
+<title>Kindergeld Auszahlungstermine {span} nach Endziffer | Kindergeld App</title>
+<meta name="description" content="Alle Kindergeld-Auszahlungstermine {span} für Endziffer 0-9 als Tabelle. Mit App: Erinnerung am Zahltag, Countdown-Widget.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body><main>
@@ -54,22 +54,23 @@ def main() -> None:
 <p>Die Familienkasse überweist das Kindergeld gestaffelt nach der <strong>letzten Ziffer Ihrer Kindergeldnummer</strong> (Endziffer).
 Beispiel: 123FK45678<strong>9</strong> → Endziffer 9. Die Nummer steht auf dem Kindergeldbescheid und im Verwendungszweck der Überweisung.</p>
 {amount_line}
-<p><a class=cta href="{APP_STORE_URL}">Kindergeld App für iPhone</a> – Erinnerung am Vortag, Countdown-Widget mit Pro. Kein Konto, kein Tracking.</p>
+<p><a class=cta href="{APP_STORE_URL}">Kindergeld App für iPhone</a>. Erinnerung am Zahltag, Countdown-Widget. Kein Konto, keine Werbung.</p>
 
 {tables}
 
-<p class="muted">Stand: {html.escape(t["updated"])}. Termine unverbindlich – es besteht kein Rechtsanspruch auf Zahlung an einem bestimmten Tag;
+<p class="muted">Stand: {html.escape(t["updated"])}. Termine unverbindlich. Es besteht kein Rechtsanspruch auf Zahlung an einem bestimmten Tag.
 Wochenenden und Feiertage können den Geldeingang verschieben. Quelle: <a href="{html.escape(t["source"])}">arbeitsagentur.de</a>.</p>
 
 <h2>Häufige Fragen</h2>
 <p><strong>Das Geld kam an einem anderen Tag.</strong><br>Banklaufzeiten, Wochenenden und Feiertage können den Geldeingang verschieben.
 Bei Fragen zur Zahlung hilft die Familienkasse: 0800&nbsp;4&nbsp;555533 (gebührenfrei).</p>
-<p><strong>Pro in der App wiederherstellen</strong><br>Einstellungen → Pro → „Käufe wiederherstellen“.</p>
+<p><strong>Kauf oder Abo wiederherstellen</strong><br>Einstellungen → Widget &amp; Kalender → „Käufe wiederherstellen“.</p>
+<p><strong>Abo kündigen</strong><br>Einstellungen → „Abo verwalten“ in der App, oder in den Einstellungen Ihres Apple Accounts. Wer im Gratismonat spätestens 24 Stunden vor dessen Ende kündigt, zahlt nichts.</p>
 
 <h2>Kontakt</h2>
 <p>E-Mail: <a href="mailto:[E-MAIL]">[E-MAIL]</a></p>
 
-<p class="muted">Inoffizielles Angebot – nicht von der Familienkasse oder der Bundesagentur für Arbeit.<br>
+<p class="muted">Inoffizielles Angebot, nicht von der Familienkasse oder der Bundesagentur für Arbeit.<br>
 <a href="privacy.html">Datenschutz</a> · <a href="impressum.html">Impressum</a></p>
 </main></body>
 </html>
