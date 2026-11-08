@@ -87,7 +87,7 @@ Wochenenden und Feiertage können den Geldeingang verschieben. Quelle: <a href="
 <h2>Häufige Fragen</h2>
 {faq_html}
 <h2>Kontakt</h2>
-<p>E-Mail: <a href="mailto:[E-MAIL]">[E-MAIL]</a></p>
+<p>E-Mail: <a href="mailto:cloudedgetech101@gmail.com">cloudedgetech101@gmail.com</a></p>
 
 <p class="muted">Inoffizielles Angebot, nicht von der Familienkasse oder der Bundesagentur für Arbeit.<br>
 <a href="privacy.html">Datenschutz</a> · <a href="impressum.html">Impressum</a></p>

@@ -17,7 +17,7 @@ import argparse, datetime, html, json, pathlib, re, subprocess, sys
 URL = "https://www.arbeitsagentur.de/familie-und-kinder/auszahlungstermine"
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "Shared" / "termine.json"
-PUBLISHED = ROOT / "docs" / "termine.json"  # served by GitHub Pages; existing installs download this
+PUBLISHED = ROOT / "docs" / "termine.json"  # read by the app via raw.githubusercontent.com; existing installs download this
 MONTHS = {m: i + 1 for i, m in enumerate(
     "Januar Februar März April Mai Juni Juli August September Oktober November Dezember".split())}
 
