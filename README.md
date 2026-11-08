@@ -10,3 +10,8 @@ Data and website for the iOS app "Kindergeld App: Termine".
   `Shared/termine.json`, run `python3 tools/update_termine.py`, push. In December the workflow opens
   an issue if next year's amount is missing.
 - Announcement to all users (one notification): `python3 tools/update_termine.py --notice "Text" --notice-id 2027-amount`, push.
+
+## Hosting
+
+- Data for the app: `docs/termine.json`, read via raw.githubusercontent.com. Updated daily by `.github/workflows/update.yml`.
+- Website: Vercel project `kindergeld-termine` deploys `docs/` on every commit to `main` (see `vercel.json`): https://kindergeld-termine.vercel.app
