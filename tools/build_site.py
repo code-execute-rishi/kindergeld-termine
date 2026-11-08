@@ -41,6 +41,28 @@ def main() -> None:
     amount_line = (f"<p>Kindergeld {datetime.date.today().year}: <strong>{amount // 100} € pro Kind und Monat</strong>. "
                    "Kinderzuschlag wird am selben Tag überwiesen.</p>") if amount else ""
 
+    # Questions people ask Google ("Weitere Fragen", Apify SERP 2026-11). Plain text answers, also as FAQPage JSON-LD.
+    year = datetime.date.today().year
+    faq = [(f"Wann wird das Kindergeld {span} überwiesen?",
+            "Das hängt von der letzten Ziffer Ihrer Kindergeldnummer ab. Die Familienkasse zahlt jeden Monat nach Endziffern von 0 bis 9. "
+            "Die Tabellen oben zeigen alle Auszahlungstermine.")]
+    if amount:
+        faq.append((f"Wie hoch ist das Kindergeld {year}?",
+                    f"{amount // 100} Euro pro Kind und Monat. Der Betrag für {year + 1} wird hier ergänzt, sobald er feststeht."))
+    faq += [("Kann das Kindergeld später kommen?",
+             "Ja. Die Bank braucht oft 1 bis 2 Werktage, Wochenenden und Feiertage verschieben den Geldeingang. "
+             "Bei Fragen zur Zahlung hilft die Familienkasse: 0800 4 555533 (gebührenfrei)."),
+            ("Wann wird der Kinderzuschlag ausgezahlt?", "Am selben Tag wie das Kindergeld."),
+            ("Hat die Familienkasse eine App?",
+             "Diese Kindergeld App ist inoffiziell und steht in keiner Verbindung zur Familienkasse. Sie zeigt die öffentlichen Termine "
+             "der Bundesagentur für Arbeit und erinnert Sie am Zahltag. Anträge stellen Sie weiter bei der Familienkasse auf arbeitsagentur.de."),
+            ("Kauf oder Abo wiederherstellen", "In der App: Einstellungen, Widget & Kalender, Käufe wiederherstellen."),
+            ("Abo kündigen", "In der App unter Einstellungen, Abo verwalten, oder in den Einstellungen Ihres Apple Accounts. "
+             "Wer im Gratismonat spätestens 24 Stunden vor dessen Ende kündigt, zahlt nichts.")]
+    faq_html = "\n".join(f"<p><strong>{html.escape(q)}</strong><br>{html.escape(a)}</p>" for q, a in faq)
+    faq_ld = json.dumps({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}, ensure_ascii=False)
+
     page = f"""<!doctype html>
 <html lang="de">
 <head>
@@ -48,6 +70,7 @@ def main() -> None:
 <title>Kindergeld Auszahlungstermine {span} nach Endziffer | Kindergeld App</title>
 <meta name="description" content="Alle Kindergeld-Auszahlungstermine {span} für Endziffer 0-9 als Tabelle. Mit App: Erinnerung am Zahltag, Countdown-Widget.">
 <link rel="stylesheet" href="style.css">
+<script type="application/ld+json">{faq_ld}</script>
 </head>
 <body><main>
 <h1>Kindergeld-Auszahlungstermine {span}</h1>
@@ -62,11 +85,7 @@ Beispiel: 123FK45678<strong>9</strong> → Endziffer 9. Die Nummer steht auf dem
 Wochenenden und Feiertage können den Geldeingang verschieben. Quelle: <a href="{html.escape(t["source"])}">arbeitsagentur.de</a>.</p>
 
 <h2>Häufige Fragen</h2>
-<p><strong>Das Geld kam an einem anderen Tag.</strong><br>Banklaufzeiten, Wochenenden und Feiertage können den Geldeingang verschieben.
-Bei Fragen zur Zahlung hilft die Familienkasse: 0800&nbsp;4&nbsp;555533 (gebührenfrei).</p>
-<p><strong>Kauf oder Abo wiederherstellen</strong><br>Einstellungen → Widget &amp; Kalender → „Käufe wiederherstellen“.</p>
-<p><strong>Abo kündigen</strong><br>Einstellungen → „Abo verwalten“ in der App, oder in den Einstellungen Ihres Apple Accounts. Wer im Gratismonat spätestens 24 Stunden vor dessen Ende kündigt, zahlt nichts.</p>
-
+{faq_html}
 <h2>Kontakt</h2>
 <p>E-Mail: <a href="mailto:[E-MAIL]">[E-MAIL]</a></p>
 
