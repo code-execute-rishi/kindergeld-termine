@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontakt | Kindergeld Termine</title>
+<link rel="stylesheet" href="style.css">
+<style>
+label { display: block; margin-top: 16px; font-weight: 600; }
+input, textarea { box-sizing: border-box; width: 100%; margin-top: 6px; padding: 10px 12px; font: inherit; color: var(--fg);
+  background: var(--bg); border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); border-radius: 10px; }
+textarea { min-height: 160px; resize: vertical; }
+button.cta { margin-top: 20px; border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+#status { margin-top: 16px; }
+</style>
+</head>
+<body><main>
+<h1>Kontakt</h1>
+<p>Schreiben Sie uns zur App „Kindergeld Termine“. Wir antworten so schnell wie möglich, wenn Sie eine E-Mail-Adresse angeben.</p>
+<p class="muted">Fragen zu Ihrem Kindergeld beantwortet nur die Familienkasse. Diese App ist inoffiziell.</p>
+<form id="f">
+  <label for="email">E-Mail-Adresse (für die Antwort)</label>
+  <input id="email" name="email" type="email" autocomplete="email" maxlength="200">
+  <label for="msg">Ihre Nachricht</label>
+  <textarea id="msg" name="msg" required maxlength="5000"></textarea>
+  <button class="cta" type="submit">Nachricht senden</button>
+  <p id="status" role="status"></p>
+</form>
+<p class="muted">Ihre Nachricht und Ihre E-Mail-Adresse gehen über PostHog (USA) an uns. Mehr dazu in der <a href="privacy.html">Datenschutzerklärung</a>. Sie erreichen uns auch per E-Mail: <a href="mailto:cloudedgetech101@gmail.com">cloudedgetech101@gmail.com</a></p>
+<p class="muted"><a href="impressum.html">Impressum</a></p>
+<script>
+// The message lands in PostHog (project "Kindergeld iOS") as a "contact_message" event, no person profile, no cookies.
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const status = document.getElementById("status"), btn = e.target.querySelector("button");
+  btn.disabled = true; status.textContent = "Wird gesendet …";
+  try {
+    const r = await fetch("https://us.i.posthog.com/i/v0/e/", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: "phc_AbBWHm6AVLFehdHj3KxpU4gv8JoYjjjdFr8kDJBK4PHv", event: "contact_message",
+        distinct_id: "contact-" + crypto.randomUUID(),
+        properties: { email: document.getElementById("email").value.trim(), message: document.getElementById("msg").value.trim(),
+                      $process_person_profile: false, source: "website" }
+      })
+    });
+    if (!r.ok) throw new Error(r.status);
+    e.target.reset(); status.textContent = "Danke. Ihre Nachricht ist angekommen.";
+  } catch (err) {
+    status.textContent = "Senden hat nicht geklappt. Bitte schreiben Sie uns eine E-Mail.";
+  } finally { btn.disabled = false; }
+});
+</script>
+</main></body>
+</html>
