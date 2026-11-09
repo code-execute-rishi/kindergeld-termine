@@ -57,7 +57,7 @@ def main() -> None:
              "Diese Kindergeld App ist inoffiziell und steht in keiner Verbindung zur Familienkasse. Sie zeigt die öffentlichen Termine "
              "der Bundesagentur für Arbeit und erinnert Sie am Zahltag. Anträge stellen Sie weiter bei der Familienkasse auf arbeitsagentur.de."),
             ("Kauf oder Abo wiederherstellen", "In der App: Einstellungen, Widget & Kalender, Käufe wiederherstellen."),
-            ("Abo kündigen", "In der App unter Einstellungen, Abo verwalten, oder in den Einstellungen Ihres Apple Accounts. "
+            ("Abo kündigen", "In der App unter Einstellungen, Abo kündigen oder verwalten, oder in den Einstellungen Ihres Apple Accounts. "
              "Wer im Gratismonat spätestens 24 Stunden vor dessen Ende kündigt, zahlt nichts.")]
     faq_html = "\n".join(f"<p><strong>{html.escape(q)}</strong><br>{html.escape(a)}</p>" for q, a in faq)
     faq_ld = json.dumps({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
