@@ -9,3 +9,4 @@ table { border-collapse: collapse; font-size: 14px; font-variant-numeric: tabula
 th, td { padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--fg) 15%, transparent); text-align: left; white-space: nowrap; }
 thead th { color: var(--muted); font-weight: 600; }
 .cta { display: inline-block; background: var(--accent); color: #fff; padding: 10px 16px; border-radius: 10px; text-decoration: none; font-weight: 600; }
+table.list { min-width: 0; }
