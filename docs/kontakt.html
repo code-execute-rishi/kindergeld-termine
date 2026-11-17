@@ -25,39 +25,61 @@ button.cta { margin-top: 20px; border: 0; cursor: pointer; font: inherit; font-w
 </style>
 </head>
 <body><main>
-<h1>Kontakt</h1>
-<p>Schreiben Sie uns zur App „Kindergeld Termine“. Wir antworten so schnell wie möglich, wenn Sie eine E-Mail-Adresse angeben.</p>
-<p class="muted">Fragen zu Ihrem Kindergeld beantwortet nur die Familienkasse. Diese App ist inoffiziell.</p>
+<h1 data-t="h1">Kontakt</h1>
+<p data-t="intro">Schreiben Sie uns zur App „Kindergeld Termine“. Wir antworten so schnell wie möglich, wenn Sie eine E-Mail-Adresse angeben.</p>
+<p class="muted" data-t="note">Fragen zu Ihrem Kindergeld beantwortet nur die Familienkasse. Diese App ist inoffiziell.</p>
 <form id="f">
-  <label for="email">E-Mail-Adresse (für die Antwort)</label>
+  <label for="email" data-t="email">E-Mail-Adresse (für die Antwort)</label>
   <input id="email" name="email" type="email" autocomplete="email" maxlength="200">
-  <label for="msg">Ihre Nachricht</label>
+  <label for="msg" data-t="msg">Ihre Nachricht</label>
   <textarea id="msg" name="msg" required maxlength="5000"></textarea>
-  <button class="cta" type="submit">Nachricht senden</button>
+  <button class="cta" type="submit" data-t="send">Nachricht senden</button>
   <p id="status" role="status"></p>
 </form>
 <p class="muted">Ihre Nachricht und Ihre E-Mail-Adresse gehen über PostHog (USA) an uns. Mehr dazu in der <a href="privacy.html">Datenschutzerklärung</a>. Sie erreichen uns auch per E-Mail: <a href="mailto:cloudedgetech101@gmail.com">cloudedgetech101@gmail.com</a></p>
 <p class="muted"><a href="impressum.html">Impressum</a></p>
 <script>
+// ?lang=en|tr|uk (the app passes its language). German is the page itself.
+const T = {
+  en: {h1: "Contact", intro: "Write to us about the app. We answer as soon as possible if you leave an e-mail address.",
+       note: "Only the Familienkasse can answer questions about your Kindergeld. This app is unofficial.",
+       email: "E-mail address (for our answer)", msg: "Your message", send: "Send message",
+       sending: "Sending …", ok: "Thank you. Your message has arrived.", fail: "Sending did not work. Please write us an e-mail."},
+  tr: {h1: "İletişim", intro: "Uygulama hakkında bize yazın. E-posta adresinizi bırakırsanız en kısa sürede yanıt veririz.",
+       note: "Kindergeld ile ilgili sorularınızı yalnızca Familienkasse yanıtlayabilir. Bu uygulama resmi değildir.",
+       email: "E-posta adresi (yanıt için)", msg: "Mesajınız", send: "Mesajı gönder",
+       sending: "Gönderiliyor …", ok: "Teşekkürler. Mesajınız ulaştı.", fail: "Gönderilemedi. Lütfen bize e-posta yazın."},
+  uk: {h1: "Контакт", intro: "Напишіть нам про застосунок. Якщо залишите e-mail, ми відповімо якнайшвидше.",
+       note: "На питання про ваш Kindergeld відповідає лише Familienkasse. Цей застосунок неофіційний.",
+       email: "E-mail (для відповіді)", msg: "Ваше повідомлення", send: "Надіслати",
+       sending: "Надсилаємо …", ok: "Дякуємо. Ваше повідомлення отримано.", fail: "Не вдалося надіслати. Будь ласка, напишіть нам e-mail."},
+  de: {sending: "Wird gesendet …", ok: "Danke. Ihre Nachricht ist angekommen.", fail: "Senden hat nicht geklappt. Bitte schreiben Sie uns eine E-Mail."}
+};
+const lang = T[new URLSearchParams(location.search).get("lang")] ? new URLSearchParams(location.search).get("lang") : "de";
+const t = (k) => (T[lang][k] ?? T.de[k]);
+if (lang !== "de") {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach((el) => { if (T[lang][el.dataset.t]) el.textContent = T[lang][el.dataset.t]; });
+}
 // The message lands in PostHog (project "Kindergeld iOS") as a "contact_message" event, no person profile, no cookies.
 document.getElementById("f").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("status"), btn = e.target.querySelector("button");
-  btn.disabled = true; status.textContent = "Wird gesendet …";
+  btn.disabled = true; status.textContent = t("sending");
   try {
     const r = await fetch("https://us.i.posthog.com/i/v0/e/", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         api_key: "phc_AbBWHm6AVLFehdHj3KxpU4gv8JoYjjjdFr8kDJBK4PHv", event: "contact_message",
         distinct_id: "contact-" + crypto.randomUUID(),
-        properties: { email: document.getElementById("email").value.trim(), message: document.getElementById("msg").value.trim(),
+        properties: { email: document.getElementById("email").value.trim(), message: document.getElementById("msg").value.trim(), lang,
                       $process_person_profile: false, source: "website" }
       })
     });
     if (!r.ok) throw new Error(r.status);
-    e.target.reset(); status.textContent = "Danke. Ihre Nachricht ist angekommen.";
+    e.target.reset(); status.textContent = t("ok");
   } catch (err) {
-    status.textContent = "Senden hat nicht geklappt. Bitte schreiben Sie uns eine E-Mail.";
+    status.textContent = t("fail");
   } finally { btn.disabled = false; }
 });
 </script>
